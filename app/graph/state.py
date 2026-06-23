@@ -34,48 +34,34 @@ class Activity(TypedDict):
     duration_hours: float
     location: str
     available_dates: List[str]
-    
+    description: str
+
 
 class Preferences(TypedDict):
     interests: List[str]
-    weather: str
-    travel_style: str
+    weather: Optional[str]
+    travel_style: Optional[str]
 
 
-class TravelState(TypedDict):
-    # Original request
+class TravelState(TypedDict, total=False):
     user_query: str
 
-    # Extracted requirements
     departure_airport: Optional[str]
+
     start_date: Optional[str]
     end_date: Optional[str]
+
     budget: Optional[float]
 
     preferences: Preferences
 
-    # Destination stage
-    destination_candidates: List[Destination]
-    selected_destination: Optional[Destination]
+    destinations: List[dict]
 
-    flight_options: List[Flight]
-    accommodation_options: List[Accommodation]
-    activity_options: List[Activity]
-    transportation_cost: float
+    flights: List[dict]
+    accommodations: List[dict]
+    activities: List[dict]
 
-    # Final selections
-    selected_flight: Optional[Flight]
-    selected_accommodation: Optional[Accommodation]
-    selected_activities: List[Activity]
+    itinerary: Optional[dict]
 
-    # Cost tracking
-    flight_cost: float
-    accommodation_cost: float
-    activity_cost: float
-
-    total_cost: float
-    remaining_budget: float
-
-    # Final output
-    daily_itinerary: List[dict]
-    itinerary: str
+    requirements_complete: bool
+    missing_fields: List[str]
