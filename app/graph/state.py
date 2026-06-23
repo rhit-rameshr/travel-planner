@@ -1,9 +1,45 @@
-# Defines shared state that every LangGraph node (flights, stays, activities, planner) can read and update.
-
 # app/graph/state.py
 
-from typing import TypedDict, List, Optional
+from typing import TypedDict, List, Optional, Dict
+from pydantic import BaseModel
 
+
+
+# Requirements Models
+
+class Requirements(BaseModel):
+    destination: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    duration_days: int | None = None
+    budget: int | None = None
+    travelers: int = 1
+    preferences: list[str] = []
+
+class Preferences(TypedDict, total=False):
+    interests: List[str]
+    weather: Optional[str]
+    travel_style: Optional[str]
+
+
+class TripRequirements(TypedDict, total=False):
+    departure_airport: Optional[str]
+
+    destination_country: Optional[str]
+    destination_city: Optional[str]
+
+    start_date: Optional[str]
+    end_date: Optional[str]
+
+    travelers: int
+
+    total_budget: Optional[float]
+
+    preferences: Preferences
+
+
+
+# Search Result Models
 
 class Destination(TypedDict):
     country: str
@@ -13,55 +49,107 @@ class Destination(TypedDict):
 
 class Flight(TypedDict):
     airline: str
-    price: float
-    duration_hours: float
-    layover_duration: float
+    flight_number: str
+
     origin: str
     destination: str
 
+    departure_time: str
+    arrival_time: str
+
+    duration_hours: float
+    layover_duration: float
+
+    price: float
+
+    booking_url: str
+
 
 class Accommodation(TypedDict):
-    type: str
+    type: str  # hotel, airbnb
+
     name: str
     location: str
-    price: float
+
+    check_in: str
+    check_out: str
+
+    nightly_rate: float
+    total_price: float
+
     rating: float
+
+    booking_url: str
 
 
 class Activity(TypedDict):
     name: str
+
+    category: str
+
     cost: float
     duration_hours: float
+
     location: str
+
     available_dates: List[str]
+
     description: str
 
 
-class Preferences(TypedDict):
-    interests: List[str]
-    weather: Optional[str]
-    travel_style: Optional[str]
+
+# Selection Models
+
+class DailyPlan(TypedDict):
+    date: str
+    activities: List[str]
+
+
+
+# Main LangGraph State
 
 
 class TravelState(TypedDict, total=False):
+    # User input
     user_query: str
 
-    departure_airport: Optional[str]
+    # Extracted requirements
+    requirements: TripRequirements
 
-    start_date: Optional[str]
-    end_date: Optional[str]
+    # Destination recommendations
+    destinations: List[Destination]
 
-    budget: Optional[float]
+    # Search results
+    flights: List[Flight]
+    accommodations: List[Accommodation]
+    activities: List[Activity]
 
-    preferences: Preferences
+    # Search status tracking
+    flights_found: bool
+    accommodations_found: bool
+    activities_found: bool
 
-    destinations: List[dict]
+    # Selected options
+    selected_flight: Flight
+    selected_accommodation: Accommodation
+    selected_activities: List[Activity]
 
-    flights: List[dict]
-    accommodations: List[dict]
-    activities: List[dict]
+    # Budget calculations
+    flight_cost: float
+    accommodation_cost: float
+    activity_cost: float
+    transportation_cost: float
 
-    itinerary: Optional[dict]
+    total_trip_cost: float
+    remaining_budget: float
 
+    # Final itinerary
+    itinerary: dict
+    daily_itinerary: List[DailyPlan]
+
+    # Workflow tracking
     requirements_complete: bool
     missing_fields: List[str]
+
+    # Error handling
+    errors: List[str]
