@@ -5,54 +5,77 @@
 from typing import TypedDict, List, Optional
 
 
-class Activity(TypedDict):
-    name: str
-    cost: float
-    duration_hours: float
+class Destination(TypedDict):
+    country: str
+    city: str
+    score: float
 
 
 class Flight(TypedDict):
     airline: str
-    departure: str
-    arrival: str
     price: float
     duration_hours: float
     layover_duration: float
+    origin: str
+    destination: str
 
 
-class Stay(TypedDict):
+class Accommodation(TypedDict):
+    type: str
     name: str
-    type: str  # Hotel or Airbnb
-    nightly_rate: float
-    total_price: float
     location: str
+    price: float
+    rating: float
+
+
+class Activity(TypedDict):
+    name: str
+    cost: float
+    duration_hours: float
+    location: str
+    available_dates: List[str]
+    
+
+class Preferences(TypedDict):
+    interests: List[str]
+    weather: str
+    travel_style: str
 
 
 class TravelState(TypedDict):
-    # Original user request
+    # Original request
     user_query: str
 
     # Extracted requirements
-    departure_airport: str | None
-    start_date: str | None
-    end_date: str | None
-    budget: float | None
+    departure_airport: Optional[str]
+    start_date: Optional[str]
+    end_date: Optional[str]
+    budget: Optional[float]
 
-    preferences: dict
+    preferences: Preferences
 
-    # Destination recommendation stage
-    destination_candidates: list
-    selected_destination: dict | None
+    # Destination stage
+    destination_candidates: List[Destination]
+    selected_destination: Optional[Destination]
 
-    # Travel planning stage
-    flight_options: list
-    hotel_options: list
-    activity_options: list
+    flight_options: List[Flight]
+    accommodation_options: List[Accommodation]
+    activity_options: List[Activity]
+    transportation_cost: float
 
-    # Final chosen itinerary
-    selected_flight: dict | None
-    selected_hotel: dict | None
-    selected_activities: list
+    # Final selections
+    selected_flight: Optional[Flight]
+    selected_accommodation: Optional[Accommodation]
+    selected_activities: List[Activity]
+
+    # Cost tracking
+    flight_cost: float
+    accommodation_cost: float
+    activity_cost: float
 
     total_cost: float
+    remaining_budget: float
+
+    # Final output
+    daily_itinerary: List[dict]
     itinerary: str
